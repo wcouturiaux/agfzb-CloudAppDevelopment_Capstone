@@ -41,12 +41,13 @@ def login_request(request):
         return render(request, 'djangoapp/registration.html')
 
 # Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+def logout_request(request):
+    logout(request)
+    return redirect('djangoapp:index')
 
 # Create a `registration_request` view to handle sign up request
-# def registration_request(request):
-# ...
+def registration_request(request):
+    return redirect('djangoapp/index')
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
