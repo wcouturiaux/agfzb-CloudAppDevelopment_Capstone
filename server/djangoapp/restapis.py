@@ -1,8 +1,8 @@
 import requests
 import json
-from .models import CarDealer
+from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-
+import pdb
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
@@ -68,8 +68,45 @@ def get_dealers_from_cf(url, **kwargs):
 # def get_dealer_by_id_from_cf(url, dealerId):
 # - Call get_request() with specified arguments
 # - Parse JSON results into a DealerView object list
-
-
+def get_dealer_reviews_from_cf(url, **kwargs):
+    results = []
+    dealerId = kwargs.get("dealerId")
+    json_result = get_request(url, dealerId=dealerId)
+    
+    if json_result:
+        reviews = json_result["dealerReviews"]
+        
+        for review in reviews:
+            if review["purchase"] is False:
+                review_obj = DealerReview(
+                    name = review["name"],
+                    purchase = review["purchase"],
+                    dealership = review["dealership"],
+                    review = review["review"],
+                    purchase_date = None,
+                    car_make = "",
+                    car_model = "",
+                    car_year = "",
+                    #sentiment = sentiment,
+                    id = review["id"]
+                )
+                results.append(review_obj)
+            else:
+                review_obj = DealerReview(
+                    name = review["name"],
+                    purchase = review["purchase"],
+                    dealership = review["dealership"],
+                    review = review["review"],
+                    purchase_date = review["purchase_date"],
+                    car_make = review["car_make"],
+                    car_model = review["car_model"],
+                    car_year = review["car_year"],
+                    #sentiment = sentiment,
+                    id = review["id"]
+                )
+                results.append(review_obj)
+        return results
+            
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
