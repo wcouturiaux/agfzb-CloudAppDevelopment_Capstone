@@ -2,8 +2,14 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-import pdb
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+api_key = os.environ.get("API_KEY")
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
@@ -11,13 +17,13 @@ def get_request(url, **kwargs):
     print(kwargs)
     print("GET from {} ".format(url))
     try:
-        response = requests.get(url, headers={'Content-Type': 'application/json'},
+            response = requests.get(url, headers={'Content-Type': 'application/json'},
             params=kwargs)
     except:
         #if any error
         print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
+        status_code = response.status_code
+        print("With status {} ".format(status_code))
     json_data = json.loads(response.text)
     return json_data
 
@@ -77,6 +83,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
         reviews = json_result["dealerReviews"]
         
         for review in reviews:
+            sentiment = analyze_review_sentiments(review["review"])
             if review["purchase"] is False:
                 review_obj = DealerReview(
                     name = review["name"],
@@ -87,7 +94,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                     car_make = "",
                     car_model = "",
                     car_year = "",
-                    #sentiment = sentiment,
+                    sentiment = sentiment,
                     id = review["id"]
                 )
                 results.append(review_obj)
@@ -101,7 +108,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                     car_make = review["car_make"],
                     car_model = review["car_model"],
                     car_year = review["car_year"],
-                    #sentiment = sentiment,
+                    sentiment = sentiment,
                     id = review["id"]
                 )
                 results.append(review_obj)
@@ -111,6 +118,18 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+def analyze_review_sentiments(dealerreview):
+    url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/4ce35e51-408e-40b6-934f-195e479cd3ae"
+    authenticator = IAMAuthenticator(api_key)
+    nlu = NaturalLanguageUnderstandingV1(
+        version='2021-08-01',
+        authenticator=authenticator)
+    nlu.set_service_url(url)
 
-
-
+    json_result = nlu.analyze(
+        text=dealerreview,
+        features=Features(sentiment=SentimentOptions()),
+        return_analyzed_text = True
+    ).get_result()
+    sentiment = json_result['sentiment']['document']['label']
+    return sentiment
