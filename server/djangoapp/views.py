@@ -6,7 +6,7 @@ from .models import CarDealer
 from .restapis import get_request, get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, date
 import logging
 import json
 import pdb
@@ -98,22 +98,23 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 def add_review(request, dealer_id):
-    if request.user.is_authenticated and request.method == "POST":
+    
+    if request.user.is_authenticated:
         url = "https://d47998ca.us-south.apigw.appdomain.cloud/api/review"
         review = {}
         review["time"] = datetime.utcnow().isoformat()
         review["dealerId"] = dealer_id
-        review["review"] = "some test review"
+        review["review"] = "some test review from POST"
         review["name"] = request.user.first_name
         review["purchase"]= True
-        review["purchase_date"]= datetime(2020, 2, 15)
+        review["purchase_date"]= date(2020, 2, 15).isoformat()
         review["car_make"]= "Jeep"
         review["car_model"]= "Gladiator"
         review["car_year"]= 2021
 
         json_payload = {}
-        json_payload["review"] = review
+        json_payload = review
         response = post_request(url, json_payload, params=review)
         return HttpResponse(response)
     else:
-        return HttpResponse("User not authenticated or incorrect request Method")
+        return HttpResponse("User not authenticated")
