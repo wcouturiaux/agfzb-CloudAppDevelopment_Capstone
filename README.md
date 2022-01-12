@@ -1,3 +1,13 @@
+# To Run in Theia
+
+In terminal run the following:
+1 cd agfzb-CloudAppDevelopment_Capstone/server
+2 pip3 install -r requirements.txt
+3 pip install --upgrade ibm-watson
+4 pip install python-dotenv
+5 python3 manage.py makemigrations
+6 python3 manage.py migrate
+
 # Final Project Template
 
 The final project for this course has several steps that you must complete. 
