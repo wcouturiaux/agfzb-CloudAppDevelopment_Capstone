@@ -79,7 +79,8 @@ def get_dealerships(request):
         url = "https://d47998ca.us-south.apigw.appdomain.cloud/api/api/dealership"
         dealerships = get_dealers_from_cf(url)
         dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        return HttpResponse(dealer_names)
+        context = dealerships
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
