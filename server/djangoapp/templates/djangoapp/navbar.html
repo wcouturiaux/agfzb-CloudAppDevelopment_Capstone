@@ -11,6 +11,10 @@
         </div>
         <div class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
+            {% if 'djangoapp/dealer' in request.path %}
+            <a class="nav-link" href="{% url 'djangoapp:add_review' dealer_id=dealerid %}">
+                Add Review</a>
+            {% endif %}
                 <span class="navbar-text">{{ user.first_name }}({{ user.username }})</span>
                 <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
             {% else %}
