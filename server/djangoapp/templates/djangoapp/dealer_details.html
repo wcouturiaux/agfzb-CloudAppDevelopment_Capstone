@@ -10,7 +10,7 @@
     <body>
 
     <!--Add a nav bar here -->
-    {% include 'djangoapp/navbar.html' with dealerid=dealer.id  %}
+    {% include 'djangoapp/navbar.html' with dealerid=dealer.id requestpath=request.path %}
     <!-- Add reviews as cards -->
         <h1>Reviews for {{dealer.full_name}}</h1>
           <div class="card-columns">
