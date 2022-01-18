@@ -1,6 +1,7 @@
 import requests
 import json
 from .models import CarDealer, DealerReview
+from django.core import serializers
 from requests.auth import HTTPBasicAuth
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
@@ -49,7 +50,7 @@ def get_dealers_from_cf(url, **kwargs):
         json_result = get_request(url, dealerId=id)
     else:
         json_result = get_request(url)
-        
+
     if json_result:
         # Get the row list in JSON as dealers
         dealers = json_result["dealerships"]
@@ -81,10 +82,10 @@ def get_dealer_reviews_from_cf(url, **kwargs):
     results = []
     dealerId = kwargs.get("dealerId")
     json_result = get_request(url, dealerId=dealerId)
-    
+
     if json_result:
         reviews = json_result["dealerReviews"]
-        
+
         for review in reviews:
             sentiment = analyze_review_sentiments(review["review"])
             if review["purchase"] is False:
@@ -100,6 +101,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                     sentiment = sentiment,
                     id = review["id"]
                 )
+                print(review_obj.sentiment)
                 results.append(review_obj)
             else:
                 review_obj = DealerReview(
@@ -114,9 +116,10 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                     sentiment = sentiment,
                     id = review["id"]
                 )
+                print(review_obj.sentiment)
                 results.append(review_obj)
         return results
-            
+
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
