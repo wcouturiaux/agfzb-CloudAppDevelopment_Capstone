@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import CarDealer, CarModel
-from .restapis import get_request, get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
+from .restapis import (get_request, get_dealers_from_cf, get_dealer_reviews_from_cf, post_request,
+                    get_reviews_count)
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime, date
@@ -109,8 +110,10 @@ def add_review(request, dealer_id):
             context['dealer_id']=dealer_id
             return render(request, 'djangoapp/add_review.html', context)
         elif request.method == "POST":
+            print(request.POST)
             url = "https://d47998ca.us-south.apigw.appdomain.cloud/api/review"
             review = {}
+            review["id"] = get_reviews_count(url) + 1
             review["time"] = datetime.utcnow().isoformat()
             review["dealerId"] = dealer_id
             review["review"] = request.POST["content"]
@@ -127,7 +130,7 @@ def add_review(request, dealer_id):
             json_payload = {}
             json_payload = review
             response = post_request(url, json_payload, params=review)
-            return redirect('djangoapp/dealer_details', dealer_id=dealer_id)
+            return redirect('djangoapp:dealer_details', dealer_id=dealer_id)
         else:
             return HttpResponse("Invalid Request type: " + request.method)
     else:

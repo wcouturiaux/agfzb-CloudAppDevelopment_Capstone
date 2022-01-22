@@ -21,7 +21,7 @@
                   <label>Vehicle Make/Model</label>
                   <select name="car" id="car" class="form-select" required>
                     {% for car in cars %}
-                    <option selected value={{car.id}}>{{ car.year|date:"Y" }} {{car.make.name}} {{car.name}}</option>
+                    <option selected value={{car.id}}>{{car.year}} {{car.car_make}} {{car.name}}</option>
                     {% endfor %}
                   </select>
               </div>
