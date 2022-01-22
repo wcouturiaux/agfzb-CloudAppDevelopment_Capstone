@@ -139,3 +139,9 @@ def analyze_review_sentiments(dealerreview):
     ).get_result()
     sentiment = json_result['sentiment']['document']['label']
     return sentiment
+
+#Call reviews db and return count of reviewsdict
+def get_reviews_count(url):
+    json_result = get_request(url)
+    print(json_result["numReviews"])
+    return json_result["numReviews"]
